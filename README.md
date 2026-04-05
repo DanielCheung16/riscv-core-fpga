@@ -1,33 +1,31 @@
-
-
-# 基于RISCV-32I五级流水CPU的FPGA实现
+# FPGA Implementation of a RISC-V 32I Five-Stage Pipelined CPU
  
-### 目录
+### Table of Contents
 
-- [基于RISCV-32I五级流水CPU的FPGA实现](#基于riscv-32i五级流水cpu的fpga实现)
-    - [目录](#目录)
-    - [使用平台](#使用平台)
-    - [安装步骤](#安装步骤)
-    - [文件目录说明](#文件目录说明)
-    - [系统框图](#系统框图)
-    - [指令集架构](#指令集架构)
-    - [版本控制](#版本控制)
+- [FPGA Implementation of a RISC-V 32I Five-Stage Pipelined CPU](#fpga-implementation-of-a-risc-v-32i-five-stage-pipelined-cpu)
+    - [Table of Contents](#table-of-contents)
+    - [Platform](#platform)
+    - [Installation Steps](#installation-steps)
+    - [File Directory Description](#file-directory-description)
+    - [System Block Diagram](#system-block-diagram)
+    - [Instruction Set Architecture](#instruction-set-architecture)
+    - [Version Control](#version-control)
 
 
-### 使用平台
+### Platform
 FPGA: Genesys2  
-Vivado：18.3  
-ModelSim：SE-64 10.5
+Vivado: 18.3  
+ModelSim: SE-64 10.5
 
-**注**：现vivado与modelsim的联合配置路径是作者电脑的路径。用户需自行配置。  
-Vivado和Modelsim联合仿真教程：  
-[vivado18.3和modelsim关联-CSDN博客](https://blog.csdn.net/baidu_25816669/article/details/135588889)  
-[Modelsim的安装及Modelsim+Vivado联合仿真教程 - devindd - 博客园](https://www.cnblogs.com/devindd/articles/16837346.html)  
+**Note**: The current Vivado and ModelSim co-simulation configuration path is the path on the author's computer. Users need to configure it by themselves.  
+Tutorials for Vivado and ModelSim co-simulation:  
+[vivado18.3 and modelsim integration - CSDN Blog](https://blog.csdn.net/baidu_25816669/article/details/135588889)  
+[ModelSim installation and ModelSim + Vivado co-simulation tutorial - devindd - Blog Garden](https://www.cnblogs.com/devindd/articles/16837346.html)  
 
-### 安装步骤
+### Installation Steps
 
 
-### 文件目录说明
+### File Directory Description
 ```
 .
 ├── CPU2.srcs
@@ -51,29 +49,30 @@ Vivado和Modelsim联合仿真教程：
 │       └── new
 ├── Init
 └── waves
+```
 
-```  
+The three folders to mainly focus on are **CPU2.srcs**, **Init**, and **waves**. `CPU2.srcs` contains the constraint files *constrs_1*, the testbench *sim_1*, and the source code *sources_1*. `Init` contains the bare-metal programs used to initialize imem and dmem, as well as the initialization files for video memory and video memory control. `waves` contains templates for loading waveforms.  
 
-主要关注**CPU2.srcs**，**Init**，**waves**三个文件夹。CPU2.srcs包含约束文件*constrs_1*，testbench*sim_1*，源代码*sources_1*。Init包含给imem和dmem初始化的裸机程序，以及显存和显存控制的初始化文件。waves包含加载波形的模板。  
-
-**注1**：在修改了Init中的coe文件后需要在vivado命令行中输入：`generate_target simulation [get_ips  <your_ip_name>]`，从而更新ip核的网表。这是由于vivado并不会因为coe文件修改而从新生成ip核，这会导致仿真时仍旧使用的旧初始化数据。  
-**注2**：waves如何使用参考[USE_WAVE.md](./USE_WAVE.md)
+**Note 1**: After modifying the `.coe` files in `Init`, you need to enter the following command in the Vivado command line: `generate_target simulation [get_ips  <your_ip_name>]`, so as to update the netlist of the IP core. This is because Vivado does not regenerate the IP core when the `.coe` file is modified, which causes the old initialization data to still be used during simulation.  
+**Note 2**: For how to use `waves`, refer to [USE_WAVE.md](./USE_WAVE.md)
 
 
-### 系统框图
-![系统框图](./pictures/Whole_System.png)  
-- CPU部分代码由Chisel转verilog生成，位于`CPU2.srcs/sources_1/imports/vsrc`
-- HDMI模块代码位于`CPU2.srcs/sources_1/imports/HDMI`
-- 其余外设代码位于`CPU2.srcs/sources_1/new`  
+### System Block Diagram
+![System Block Diagram](./pictures/Whole_System.png)  
+- The CPU code is generated from Chisel into Verilog and is located in `CPU2.srcs/sources_1/imports/vsrc`
+- The HDMI module code is located in `CPU2.srcs/sources_1/imports/HDMI`
+- The other peripheral code is located in `CPU2.srcs/sources_1/new`  
 
-**注**：由于实验硬件设备的限制，此处键盘使用的是按键的形式（对应的`CPU2.srcs/sources_1/new/virtual_ky.sv`。）但是作者也构建了PS2键盘的使用模式（对应的`CPU2.srcs/sources_1/new/ky.sv`。）若想要使用PS2键盘需通过git回到初始版本，并添加约束和转换模块，使得Genesys2 支持相应功能。
+**Note**: Due to the limitations of the experimental hardware devices, the keyboard here is implemented in the form of buttons (corresponding to `CPU2.srcs/sources_1/new/virtual_ky.sv`). However, the author also built a PS/2 keyboard mode (corresponding to `CPU2.srcs/sources_1/new/ky.sv`). If you want to use a PS/2 keyboard, you need to use git to return to the initial version and add constraints and conversion modules so that Genesys2 supports the corresponding function.
 
-### 指令集架构
-请阅读[RISCV中文指令集架构手册](http://riscvbook.com/chinese/RISC-V-Reader-Chinese-v2p1.pdf)   
-中断请阅读[特权指令部分](https://www.scs.stanford.edu/~zyedidia/docs/riscv/riscv-privileged.pdf)。
+### Instruction Set Architecture
+Please read the [Chinese RISC-V Instruction Set Architecture Manual](http://riscvbook.com/chinese/RISC-V-Reader-Chinese-v2p1.pdf).  
+For interrupts, please read the [Privileged Instruction section](https://www.scs.stanford.edu/~zyedidia/docs/riscv/riscv-privileged.pdf).
 
-### 版本控制
-该项目使用Git进行版本管理。您可以在repository参看当前可用版本。
+### Version Control
+This project uses Git for version management. You can check the currently available versions in the repository.
+
+
 
 
 
